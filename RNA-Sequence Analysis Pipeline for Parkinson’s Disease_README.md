@@ -29,8 +29,7 @@ module load subread/2.0.6
 
 ## Steps
 
-### Step 1: open the termoinal
-- .
+### Step 1: open the terminal
 
 ### Step 2: Install Required Libraries
 - Load the required libraries using the module commands provided above.
