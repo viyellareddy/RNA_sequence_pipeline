@@ -1,7 +1,8 @@
-#!/bin/bash
+#!/bin/bash/unix
 
-# Step 1: Login to carbonate
-# This step is skipped as it is user-specific.
+
+# Step 1: open terminal
+
 
 # Step 2: Load required libraries for the RNA sequence pipeline
 module load sra-toolkit/2.10.8
