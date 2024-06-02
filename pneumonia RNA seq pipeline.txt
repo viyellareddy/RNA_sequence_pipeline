@@ -1,0 +1,69 @@
+#!/bin/bash
+
+# Step 1: Login to carbonate
+# This step is skipped as it is user-specific.
+
+# Step 2: Load required libraries for the RNA sequence pipeline
+module load sra-toolkit/2.10.8
+module load samtools/1.9
+module load fastqc/0.11.9
+module load hisat2/2.1.0
+module load subread/2.0.6
+
+# Step 3: Download all the SRR files using fastq-dump
+for i in {SRR13019394..SRR13019404}
+do
+  fastq-dump SRR${i}
+done
+
+# Step 4: Run FastQC (Quality control step)
+for file in *.fastq
+do
+  fastqc $file
+done
+
+# Step 5: Download genome indices from HISAT2
+curl -O https://genome-idx.s3.amazonaws.com/hisat/grch38_genome.tar.gz
+tar -xvzf grch38_genome.tar.gz
+
+# Step 6: Perform HISAT2 alignment for all the .fastq files
+for file in *.fastq
+do
+  hisat2 -x grch38_genome -U $file -S ${file%.fastq}.sam
+  samtools view -bS ${file%.fastq}.sam > ${file%.fastq}.bam
+  samtools sort ${file%.fastq}.bam -o ${file%.fastq}_sorted.bam
+  rm ${file%.fastq}.sam
+  rm ${file%.fastq}.bam
+done
+
+# Step 7: The output is sorted .bam files, view with samtools
+for file in *_sorted.bam
+do
+  samtools view $file
+done
+
+# Step 8: Quantification step using featureCounts
+# Download gene annotation from Ensembl
+curl -O http://ftp.ensembl.org/pub/release-106/gtf/homo_sapiens/Homo_sapiens.GRCh38.106.gtf.gz
+gunzip Homo_sapiens.GRCh38.106.gtf.gz
+
+# Perform the quantification step for all the .bam files
+featureCounts -a Homo_sapiens.GRCh38.106.gtf -o counts.txt *_sorted.bam
+
+# Step 9: Differential expression analysis using DESeq2 and GEOquery in R
+# Note: This step is performed in R, not in the Unix shell script
+
+# Step 10: Download the metadata from the GEO database using GEO accession number GSE161199
+# Note: This step is also performed in R
+
+# Step 11: Create volcano plot and MD plot for DEGs
+# Note: This step is performed in R
+
+# Step 12: Gene Ontology and KEGG analysis using RShinyGO
+# Note: This step is performed in R
+
+# Step 13: List of top 10 Differentially Expressed Genes
+# Note: This information is derived from the R analysis
+
+# Completion message
+echo "RNA-seq pipeline executed successfully."
