@@ -1,4 +1,4 @@
-#!/bin/bash/unix
+#unix
 
 
 # Step 1: open terminal
